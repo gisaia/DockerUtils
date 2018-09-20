@@ -8,7 +8,7 @@
 
 
  ```bash
- docker run --rm -v `pwd`:/schema gisaia/jsonschema2md:0.1.1 -d /schema/json -o /schema/out -x -
+ docker run --rm -v `pwd`:/schema gisaia/jsonschema2md:0.1.2 -d /schema/json -o /schema/out -x -
  ```
 
 ## Help
@@ -16,7 +16,7 @@
  By running the container without parameters you can see all options availables
 
  ```bash
- docker run --rm -v `pwd`:/schema gisaia/jsonschema2md:0.1.1
+ docker run --rm -v `pwd`:/schema gisaia/jsonschema2md:0.1.2
  ```
 
 ## Publish the docker image in DockerHub :
