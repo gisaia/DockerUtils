@@ -21,5 +21,5 @@ LABEL com.gisaia.tools.jsonschema2md=0.1.0
 LABEL vendor="Gisaïa"
 LABEL description="This container build and serve the jsonschema2md app"
 
-ENTRYPOINT ["./node_modules/.bin/jsonschema2md"]
+ENTRYPOINT ["/bin/sh", "run.sh"]
 CMD []
