@@ -6,7 +6,8 @@ WORKDIR /opt/build
 #install git
 RUN apk update && apk upgrade && apk add --no-cache bash git openssh
 #clone ets-wfs20 project
-RUN git clone https://github.com/opengeospatial/ets-wfs20.git  /opt/build
+RUN git clone -b feature/adaptTemporalTest https://github.com/gisaia/ets-wfs20.git  /opt/build
+
 #compile and move jar
 RUN mvn install && mv /opt/build/target/ets-wfs20-*-aio.jar /opt/build/ets-wfs20.jar
 ###################
