@@ -1,3 +1,4 @@
 .DS_Store
 swagger-codegen/2.2.3/Docker/configure_user_and_group.bash
 swagger-codegen/2.3.1/Docker/configure_user_and_group.bash
+maven-3.5-jdk8-alpine/Docker/configure_user_and_group.bash
