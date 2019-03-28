@@ -5,7 +5,7 @@ Swagger_CodeGen::Docker_build () {
   local REPOSITORY_NAME="gisaia/swagger-codegen-$SWAGGER_CODEGEN_VERSION"
   local DOCKER_IMAGE_VERSION="$(cat "$PROJECT_ROOT_DIRECTORY/swagger-codegen/$SWAGGER_CODEGEN_VERSION/docker_image_version")"
 
-  cp "$PROJECT_ROOT_DIRECTORY/swagger-codegen/common/Docker/configure_user_and_group.bash" "$DOCKER_DIRECTORY/"
+  cp "$PROJECT_ROOT_DIRECTORY/common/Docker/configure_user_and_group.bash" "$DOCKER_DIRECTORY/"
 
   Docker::build
 
@@ -19,7 +19,7 @@ Swagger_CodeGen::Docker_publish () {
   local REPOSITORY_NAME="gisaia/swagger-codegen-$SWAGGER_CODEGEN_VERSION"
   local DOCKER_IMAGE_VERSION="$(cat "$PROJECT_ROOT_DIRECTORY/swagger-codegen/$SWAGGER_CODEGEN_VERSION/docker_image_version")"
 
-  cp "$PROJECT_ROOT_DIRECTORY/swagger-codegen/common/Docker/configure_user_and_group.bash" "$DOCKER_DIRECTORY/"
+  cp "$PROJECT_ROOT_DIRECTORY/common/Docker/configure_user_and_group.bash" "$DOCKER_DIRECTORY/"
 
   Docker::publish
 

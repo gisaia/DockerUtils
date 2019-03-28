@@ -22,6 +22,5 @@ WORKDIR /opt/swagger
 COPY --from=build /opt/swagger/swagger-codegen-cli.jar /opt/swagger/
 
 ADD configure_user_and_group.bash entrypoint.bash /opt/
-RUN chmod u+x /opt/configure_user_and_group.bash
 
 ENTRYPOINT ["bash", "/opt/entrypoint.bash"]
