@@ -2,6 +2,7 @@
 
 |||
 --|--
+[arlas-hits-exporter](arlas-hits-exporter) | Export all the results of a given ARLAS-server search request as a JSON or CSV file. Documentation [here](arlas-hits-exporter/README.md)
 [ets-wfs20-dockerfile](ets-wfs20-dockerfile) | Execute ets-wfs suite tests for WFS.
 [ets-cat30-dockerfile](ets-cat30-dockerfile) | Execute ets-csw suite tests for CSW.
 [jsonschema2md](jsonschema2md) | Generate `.md` files based on `.json` schema.
