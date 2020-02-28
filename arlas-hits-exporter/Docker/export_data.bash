@@ -8,6 +8,7 @@ usage(){
 	echo " --format                Export format : json | csv"
 	echo " --sort_csv              Columns of csv to sort on  : -k1 -k2"
 	echo " --output                Folder where exported data is generated"
+	echo " --auth                  Type of authentication to ARLAS-server. Availabe options: 'basic'"
 	exit 1
 }
 
@@ -38,6 +39,10 @@ case "$i" in
     OUTPUT="${i#*=}"
     shift # past argument=value
     ;;
+    --auth=*)
+    AUTH="${i#*=}"
+    shift # past argument=value
+    ;;
     *)
     # unknown option
     ;;
@@ -57,18 +62,31 @@ if [ "${FORMAT}" != "csv" ] && [ "${FORMAT}" != "json" ]; then
     >&2 echo "ERROR : --format argument must be 'json' or 'csv'"
     exit 1
 fi
-echo "- Set credentials to connect to ARLAS-server (press enter to skip if no credentials needed)   ==>"
-echo -n Login:
-read login
-echo -n Password:
-read -s password
-echo
+
+if [ -v AUTH ]; then
+    if [ "${AUTH}" != "basic" ]; then
+        >&2 echo "ERROR : unknown authentication type '$AUTH'. Abort..."
+        usage
+        exit 1
+    else
+        echo "- Set credentials to connect to ARLAS-server (press enter to skip if no credentials needed)   ==>"
+        echo -n Login:
+        read login
+        echo -n Password:
+        read -s password
+        echo
+    fi
+else
+    login=""
+    password=""
+fi
+
 # Run Command
 ## CONCATENATE FIELDS TO INCLUDE TO THE URL
 SEARCH_URL="${SEARCH_URL}&include=${INCLUDE}"
 ## LAUNCH THE FIRST REQUEST
-curl -X GET "${SEARCH_URL}" -u ${login}:${password} -H "accept: application/json;charset=utf-8" > tmp_search_response.txt
-if jq . >/dev/null 2>&1 <<< $(head tmp_search_response.txt); then
+http_response_code=$(curl -X GET "${SEARCH_URL}" -u ${login}:${password} -w "%{http_code}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
+if [ $http_response_code == "200" ]; then
     nbhits=$(jq '.nbhits' tmp_search_response.txt)
 else
     echo
@@ -93,7 +111,7 @@ then
     T=$(jq .links.next.href tmp_search_response.txt)
     while [ "${T}" != "null" ]
         do
-            curl -X GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8" > tmp_search_response.txt
+            curl -X GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt
             nbhits=$(jq '.nbhits' tmp_search_response.txt)
             if [ "$nbhits" -eq 0 ]
             then 
