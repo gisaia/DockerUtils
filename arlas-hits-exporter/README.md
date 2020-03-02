@@ -43,6 +43,8 @@ Argument | Description
 `--include=...` | Comma separated field names/paths to include in the exported file.
 `--format=...` | Export format : `json` or `csv`. (Default format is `json`)
 `--sort_csv` | Columns of csv to sort on. For example add  `--sort_csv=-k1 -k2` to sort on the first and second columns
+`--output=...` | Path where the exported json|csv file is generated.
+`--auth=...` | Type of authentication to ARLAS-server. Availabe options: 'basic'.
 
 ## Example
 
