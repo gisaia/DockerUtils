@@ -93,6 +93,8 @@ else
     echo "Failed to parse data: "
     echo 
     cat tmp_search_response.txt
+    rm -f tmp_search_response.txt
+    exit 1
 fi
 
 if [ -v nbhits ] && [ "$nbhits" -ne 0 ]
@@ -111,8 +113,21 @@ then
     T=$(jq .links.next.href tmp_search_response.txt)
     while [ "${T}" != "null" ]
         do
-            curl -X GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt
-            nbhits=$(jq '.nbhits' tmp_search_response.txt)
+            http_response_code=$(curl -X GET ${T//\"} -u ${login}:${password} -w "%{http_code}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
+            if [ $http_response_code == "200" ]; then
+                nbhits=$(jq '.nbhits' tmp_search_response.txt)
+            else
+                echo
+                echo "Failed to fetch data using the following request: "
+                echo 
+                echo "${T//\"}"
+                echo
+                echo "Error message:"
+                echo
+                cat tmp_search_response.txt
+                rm -f tmp_search_response.txt
+                exit 1
+            fi
             if [ "$nbhits" -eq 0 ]
             then 
                 break
@@ -133,8 +148,9 @@ then
         if [ -v SORT_CSV ]; then
             ## SORT CSV
             echo "### Sorting CSV"
-            (head -n1 csv_exported_data.csv && sort -t ';' ${SORT_CSV} <(tail -n+2 exported_data.csv))>sorted_exported_data.csv
-            mv sorted_exported_data.csv csv_exported_data.csv
+            (head -n1 csv_exported_data.csv && sort -t ';' ${SORT_CSV} <(tail -n+2 csv_exported_data.csv))>sorted_exported_data.csv
+            rm csv_exported_data.csv
+            mv sorted_exported_data.csv ${OUTPUT}/exported_data.csv
             echo "==> CSV sorted"
         else
             mv csv_exported_data.csv "${OUTPUT}/exported_data.csv"
@@ -142,9 +158,9 @@ then
         echo "### Successfull CSV export"
     else
         ## FORMAT JSON FILE
-        jq -s '.' non_formatted_data.json > exported_data.json
+        jq -s '.' non_formatted_data.json > json_exported_data.json
         rm non_formatted_data.json
-        mv exported_data.json "${OUTPUT}/exported_data.json"
+        mv json_exported_data.json "${OUTPUT}/exported_data.json"
         echo "### Successfull JSON export"
     fi
     
