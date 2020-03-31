@@ -8,10 +8,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.*;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.cluster.health.ClusterIndexHealth;
@@ -63,6 +60,28 @@ public class ElasticRESTClient extends ElasticClient {
         Arrays.asList(getIndexResponse.getIndices()).stream()
                 .filter(index -> index.startsWith("."))
                 .forEach(index -> System.out.println("  - " + index));
+
+        System.out.println("CHECK ACCESS : ");
+        Arrays.asList(getIndexResponse.getIndices()).stream()
+                .forEach(index -> {
+                    try {
+                        System.out.println("  - " + index + " is visible? " + indexExists(index));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    public boolean indexExists(String index) throws Exception {
+        try {
+            return client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT);
+        } catch (ResponseException e) {
+            if (e.getResponse().getStatusLine().getStatusCode() == 404) {
+                return false;
+            }
+            System.out.println("Exception while communicating with ES: " + e.getMessage());
+            throw new IOException(e.getMessage());
+        }
     }
 
     @Override

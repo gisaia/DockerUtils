@@ -1,13 +1,13 @@
 ## Build
    
    ```bash
-   docker build -t gisaia/es-client-debugger:7.3.2 .
+   docker build -t gisaia/es-client-debugger:7.6.0 .
    ```
 
 ## Publish
    
    ```bash
-   docker push gisaia/es-client-debugger:7.3.2
+   docker push gisaia/es-client-debugger:7.6.0
    ```
 
 ## Run
