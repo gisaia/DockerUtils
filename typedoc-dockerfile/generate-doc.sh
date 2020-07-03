@@ -9,7 +9,7 @@ mkdir typedoc_docs
 
 ## INSTALL DEPENDENCIES OF THE MOUNTED FOLDER + INSTALL TYPEDOC AND MARKDOWN PLUGIN
 npm install
-npm add typedoc@0.13.0 typedoc-plugin-markdown@1.1.20
+npm add typedoc@0.17.8 typedoc-plugin-markdown@2.3.1
 
 ## GENERATE THE DOCUMENTATTION
 node_modules/.bin/typedoc --mode modules --theme markdown --module es2015 --excludePrivate --out ./typedoc_docs/ --exclude **/*.spec.ts "$1"
