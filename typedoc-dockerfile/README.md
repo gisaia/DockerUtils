@@ -5,7 +5,7 @@
 - Mount the project folder as a volume into /docs :
 
 ```
-docker run --rm -it -v `pwd`:/docs gisaia/typedocgen:0.0.5 generatedoc
+docker run --rm -it -v `pwd`:/docs gisaia/typedocgen:0.0.6 generatedoc
 ```
 
 >Most of the time, your project folder contains a node_modules folder that can be source of troubles while generating the documentation.
@@ -15,7 +15,7 @@ Please consider in that case applying the following use case:
 - If you want to generate documentation from typscript files that are in a specific folder in your project folder :
 
 ```
-docker run --rm -it -v `pwd`:/docs gisaia/typedocgen:0.0.5 generatedoc relative/path/to/the/specific/folder
+docker run --rm -it -v `pwd`:/docs gisaia/typedocgen:0.0.6 generatedoc relative/path/to/the/specific/folder
 ```
 
 ## Generated documentation :
