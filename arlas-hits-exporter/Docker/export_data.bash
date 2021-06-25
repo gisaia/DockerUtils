@@ -8,7 +8,7 @@ usage(){
 	echo " --format                Export format : json | csv"
 	echo " --sort_csv              Columns of csv to sort on  : -k1 -k2"
 	echo " --output                Folder where exported data is generated"
-	echo " --auth                  Type of authentication to ARLAS-server. Availabe options: 'basic'"
+	echo " --auth                  Type of authentication to ARLAS-server. Availabe options: 'basic' and 'token'"
 	exit 1
 }
 
@@ -39,8 +39,12 @@ case "$i" in
     OUTPUT="${i#*=}"
     shift # past argument=value
     ;;
-    --auth=*)
+		--auth=*)
     AUTH="${i#*=}"
+    shift # past argument=value
+    ;;
+		--token=*)
+    TOKEN="${i#*=}"
     shift # past argument=value
     ;;
     *)
@@ -64,17 +68,20 @@ if [ "${FORMAT}" != "csv" ] && [ "${FORMAT}" != "json" ]; then
 fi
 
 if [ -v AUTH ]; then
-    if [ "${AUTH}" != "basic" ]; then
-        >&2 echo "ERROR : unknown authentication type '$AUTH'. Abort..."
-        usage
-        exit 1
-    else
-        echo "- Set credentials to connect to ARLAS-server (press enter to skip if no credentials needed)   ==>"
-        echo -n Login:
-        read login
-        echo -n Password:
-        read -s password
-        echo
+    if [ "${AUTH}" == "basic" ]; then
+			echo "- Set credentials to connect to ARLAS-server (press enter to skip if no credentials needed)   ==>"
+			echo -n Login:
+			read login
+			echo -n Password:
+			read -s password
+			echo
+    else if [ "${AUTH}" == "token" ]; then
+			if [ ! -v TOKEN ]; then >&2 echo "ERROR : --token argument is missing "; usage; fi
+			TOKEN_HEADER="-H 'authorization: bearer "$TOKEN"'"
+		else
+			>&2 echo "ERROR : unknown authentication type '$AUTH'. Abort..."
+			usage
+			exit 1
     fi
 else
     login=""
@@ -85,18 +92,18 @@ fi
 ## CONCATENATE FIELDS TO INCLUDE TO THE URL
 SEARCH_URL="${SEARCH_URL}&include=${INCLUDE}"
 ## LAUNCH THE FIRST REQUEST
-http_response_code=$(curl -X GET "${SEARCH_URL}" -u ${login}:${password} -w "%{http_code}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
+http_response_code=$(curl -X GET "${SEARCH_URL}" -u ${login}:${password} -w "%{http_code}" -H "accept: application/json;charset=utf-8" $TOKEN_HEADER -o tmp_search_response.txt)
 if [ $http_response_code == "200" ]; then
     nbhits=$(jq '.nbhits' tmp_search_response.txt)
 else
     echo
     echo "Failed to parse data: "
-    echo 
+    echo
     cat tmp_search_response.txt
 fi
 
 if [ -v nbhits ] && [ "$nbhits" -ne 0 ]
-then 
+then
     ## SELECT `hits.data` IN tmp_search_response.txt
     jq '.hits[] | .data' tmp_search_response.txt > tmp.txt
     if [ "${FORMAT}" == "csv" ]; then
@@ -111,10 +118,10 @@ then
     T=$(jq .links.next.href tmp_search_response.txt)
     while [ "${T}" != "null" ]
         do
-            curl -X GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt
+            curl -X GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8"  $TOKEN_HEADER -o tmp_search_response.txt
             nbhits=$(jq '.nbhits' tmp_search_response.txt)
             if [ "$nbhits" -eq 0 ]
-            then 
+            then
                 break
             fi
             jq '.hits[] | .data' tmp_search_response.txt > tmp.txt
@@ -147,7 +154,7 @@ then
         mv exported_data.json "${OUTPUT}/exported_data.json"
         echo "### Successfull JSON export"
     fi
-    
+
 else
     if [ ! -v nbhits ]; then
         echo "No data exported"
