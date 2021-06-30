@@ -2,16 +2,16 @@
 set -o errexit -o pipefail -o nounset
 
 usage(){
-	echo "USAGE : ./export_data.bash --search_url=X --include=Y --format=Z --sort_csv=V"
+	echo "USAGE : ./export_data.bash --search_url=X --include=Y --format=Z --auth=token --token=T"
 	echo " --search_url            Search request url which result is exported. Put the url between double or simple quotes."
 	echo " --include               Comma separated field names/paths to include in the exported file"
 	echo " --format                Export format : json | csv"
-	echo " --sort_csv              Columns of csv to sort on  : -k1 -k2"
 	echo " --output                Folder where exported data is generated"
 	echo " --auth                  Type of authentication to ARLAS-server. Availabe options: 'basic' and 'token'"
+	echo " --token                 Token to pass to the request if --auth=token"
 	exit 1
 }
-
+TOKEN=""
 for i in "$@"
 do
 case "$i" in
@@ -39,11 +39,11 @@ case "$i" in
     OUTPUT="${i#*=}"
     shift # past argument=value
     ;;
-		--auth=*)
+    --auth=*)
     AUTH="${i#*=}"
     shift # past argument=value
     ;;
-		--token=*)
+    --token=*)
     TOKEN="${i#*=}"
     shift # past argument=value
     ;;
@@ -66,7 +66,9 @@ if [ "${FORMAT}" != "csv" ] && [ "${FORMAT}" != "json" ]; then
     >&2 echo "ERROR : --format argument must be 'json' or 'csv'"
     exit 1
 fi
-
+TOKEN_HEADER=""
+login=""
+password=""
 if [ -v AUTH ]; then
     if [ "${AUTH}" == "basic" ]; then
 			echo "- Set credentials to connect to ARLAS-server (press enter to skip if no credentials needed)   ==>"
@@ -77,22 +79,20 @@ if [ -v AUTH ]; then
 			echo
     else if [ "${AUTH}" == "token" ]; then
 			if [ ! -v TOKEN ]; then >&2 echo "ERROR : --token argument is missing "; usage; fi
-			TOKEN_HEADER="-H 'authorization: bearer "$TOKEN"'"
+			TOKEN_HEADER="-H 'authorization: bearer "${TOKEN}"'"
 		else
 			>&2 echo "ERROR : unknown authentication type '$AUTH'. Abort..."
 			usage
 			exit 1
+        fi
     fi
-else
-    login=""
-    password=""
 fi
 
 # Run Command
 ## CONCATENATE FIELDS TO INCLUDE TO THE URL
 SEARCH_URL="${SEARCH_URL}&include=${INCLUDE}"
 ## LAUNCH THE FIRST REQUEST
-http_response_code=$(curl -X GET "${SEARCH_URL}" -u ${login}:${password} -w "%{http_code}" -H "accept: application/json;charset=utf-8" $TOKEN_HEADER -o tmp_search_response.txt)
+http_response_code=$(curl -X GET "${SEARCH_URL}" -u ${login}:${password} -w "%{http_code}" -H "authorization: bearer ${TOKEN}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
 if [ $http_response_code == "200" ]; then
     nbhits=$(jq '.nbhits' tmp_search_response.txt)
 else
@@ -101,7 +101,6 @@ else
     echo
     cat tmp_search_response.txt
 fi
-
 if [ -v nbhits ] && [ "$nbhits" -ne 0 ]
 then
     ## SELECT `hits.data` IN tmp_search_response.txt
@@ -118,7 +117,7 @@ then
     T=$(jq .links.next.href tmp_search_response.txt)
     while [ "${T}" != "null" ]
         do
-            curl -X GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8"  $TOKEN_HEADER -o tmp_search_response.txt
+            curl -X GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8"  -H "authorization: bearer ${TOKEN}" -o tmp_search_response.txt
             nbhits=$(jq '.nbhits' tmp_search_response.txt)
             if [ "$nbhits" -eq 0 ]
             then
