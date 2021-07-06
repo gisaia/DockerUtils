@@ -92,7 +92,7 @@ fi
 ## CONCATENATE FIELDS TO INCLUDE TO THE URL
 SEARCH_URL="${SEARCH_URL}&include=${INCLUDE}"
 ## LAUNCH THE FIRST REQUEST
-http_response_code=$(curl -X GET "${SEARCH_URL}" -u ${login}:${password} -w "%{http_code}" -H "authorization: bearer ${TOKEN}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
+http_response_code=$(curl -k -X GET "${SEARCH_URL}" -u ${login}:${password} -w "%{http_code}" -H "authorization: bearer ${TOKEN}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
 if [ $http_response_code == "200" ]; then
     nbhits=$(jq '.nbhits' tmp_search_response.txt)
 else
