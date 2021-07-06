@@ -117,7 +117,7 @@ then
     T=$(jq .links.next.href tmp_search_response.txt)
     while [ "${T}" != "null" ]
         do
-            curl -X GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8"  -H "authorization: bearer ${TOKEN}" -o tmp_search_response.txt
+            curl -k -X  GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8"  -H "authorization: bearer ${TOKEN}" -o tmp_search_response.txt
             nbhits=$(jq '.nbhits' tmp_search_response.txt)
             if [ "$nbhits" -eq 0 ]
             then
