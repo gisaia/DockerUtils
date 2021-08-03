@@ -9,11 +9,7 @@ docker run -ti \
 
 ## Publish the docker image in DockerHub :
 ```
-docker build -t gisaia/spark:x.x.x -t gisaia/spark:latest .
-```
-```
+docker build -t gisaia/spark:3.1.2 -t gisaia/spark:latest .
 docker login
-```
-```
 docker push gisaia/spark
 ```
