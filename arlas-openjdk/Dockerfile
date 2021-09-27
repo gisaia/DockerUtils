@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk:8-bullseye
 WORKDIR /opt/app
 
 # install script dependencies
