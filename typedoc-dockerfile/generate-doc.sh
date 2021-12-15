@@ -12,7 +12,7 @@ npm install
 npm add typedoc@0.22.10 typedoc-plugin-markdown@3.11.7
 
 ## GENERATE THE DOCUMENTATTION
-node_modules/.bin/typedoc  --theme markdown  --excludePrivate --out ./typedoc_docs/ --exclude **/*.spec.ts "$1"
+node_modules/.bin/typedoc  --theme markdown  --excludePrivate --out ./typedoc_docs/ $(echo "$@"| tr " " "\n")
 
 ## UNINSTALL TYPEDOC AND MARKDOWN PLUGIN, TO REMOVE IT FROM package.json OF THE MOUNTED FOLDER
 npm remove typedoc typedoc-plugin-markdown
