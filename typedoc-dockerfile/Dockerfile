@@ -1,5 +1,5 @@
 # We label our stage as 'typedoc'
-FROM node:10.21-alpine as typedoc
+FROM node:16.13-alpine as typedoc
 
 WORKDIR typedoc
 

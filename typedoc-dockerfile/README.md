@@ -15,7 +15,7 @@ Please consider in that case applying the following use case:
 - If you want to generate documentation from typscript files that are in a specific folder in your project folder :
 
 ```
-docker run --rm -it -v `pwd`:/docs gisaia/typedocgen:0.0.6 generatedoc relative/path/to/the/specific/folder
+docker run --rm -it -v `pwd`:/docs gisaia/typedocgen:0.0.7 generatedoc relative/path/to/the/specific/folder
 ```
 
 ## Generated documentation :
@@ -25,7 +25,7 @@ The markdown files are generated in `typedoc_docs` folder within your project fo
 ## Publish the docker image in DockerHub : 
 
 ```
-docker build -t gisaia/typedocgen:x.x.x gisaia/typedocgen:latest .
+docker build -t gisaia/typedocgen:x.x.X -t gisaia/typedocgen:latest .
 ```
 ```
 docker login
