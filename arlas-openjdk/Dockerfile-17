@@ -2,6 +2,31 @@ FROM openjdk:17-jdk-slim-bullseye
 WORKDIR /opt/app
 
 # install script dependencies
-RUN apt-get update && apt-get install -y bash netcat-openbsd curl
+# install last version of curl to avoid vulnerabilities
+RUN apt-get update  &&\
+    apt-get install -y \ 
+    wget \
+    gzip \
+    liblzma5 \ 
+    bash \ 
+    netcat-openbsd \
+    libssl-dev \  
+    autoconf \ 
+    libtool \ 
+    make \ 
+    openssl \ 
+    libssl1.1  \ 
+    && \
+    wget https://curl.se/download/curl-7.83.1.tar.gz && \
+    tar -xvf curl-7.83.1.tar.gz && \ 
+    cd curl-7.83.1 && \ 
+    ./buildconf  &&\
+    ./configure --with-ssl && \
+     make && \ 
+     make install &&\
+    apt-get remove -y libssl-dev autoconf libtool make &&  apt-get autoremove -y 
+
+
+
 
 ADD elastic-apm-agent-*.jar /opt/app/elastic-apm-agent.jar
