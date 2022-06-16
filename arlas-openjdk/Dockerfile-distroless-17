@@ -1,0 +1,12 @@
+FROM bitnami/minideb AS deb_extractor
+RUN cd /tmp && \
+    apt-get update && apt-get download \
+        netcat-openbsd curl && \
+    mkdir /dpkg && \
+    for deb in *.deb; do dpkg --extract $deb /dpkg || exit 10; done
+
+FROM gcr.io/distroless/java17-debian11
+WORKDIR /opt/app
+
+COPY --from=deb_extractor /dpkg /
+ADD elastic-apm-agent-*.jar /opt/app/elastic-apm-agent.jar
