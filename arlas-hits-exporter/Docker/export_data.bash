@@ -11,7 +11,6 @@ usage(){
 	echo " --token                 Token to pass to the request if --auth=token"
 	exit 1
 }
-TOKEN=""
 for i in "$@"
 do
 case "$i" in
@@ -66,7 +65,6 @@ if [ "${FORMAT}" != "csv" ] && [ "${FORMAT}" != "json" ]; then
     >&2 echo "ERROR : --format argument must be 'json' or 'csv'"
     exit 1
 fi
-TOKEN_HEADER=""
 login=""
 password=""
 if [ -v AUTH ]; then
@@ -78,8 +76,8 @@ if [ -v AUTH ]; then
 			read -s password
 			echo
     else if [ "${AUTH}" == "token" ]; then
-			if [ ! -v TOKEN ]; then >&2 echo "ERROR : --token argument is missing "; usage; fi
-			TOKEN_HEADER="-H 'authorization: bearer "${TOKEN}"'"
+			if [ ! -v TOKEN ]; then >&2 echo "ERROR : --token argument is missing "; usage; 
+            fi
 		else
 			>&2 echo "ERROR : unknown authentication type '$AUTH'. Abort..."
 			usage
@@ -92,7 +90,20 @@ fi
 ## CONCATENATE FIELDS TO INCLUDE TO THE URL
 SEARCH_URL="${SEARCH_URL}&include=${INCLUDE}"
 ## LAUNCH THE FIRST REQUEST
-http_response_code=$(curl -k -X GET "${SEARCH_URL}" -u ${login}:${password} -w "%{http_code}" -H "authorization: bearer ${TOKEN}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
+http_response_code=$(curl -k -X GET "${SEARCH_URL}" -w "%{http_code}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
+if [ -v AUTH ]; then
+    if [ "${AUTH}" == "basic" ]; then
+        http_response_code=$(curl -k -X GET "${SEARCH_URL}" -u "${login}:${password}" -w "%{http_code}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
+    else if [ "${AUTH}" == "token" ]; then
+			if [ ! -v TOKEN ]; then >&2 echo "ERROR : --token argument is missing "; usage; fi
+			http_response_code=$(curl -k -X GET "${SEARCH_URL}"  -w "%{http_code}" -H "authorization: Basic ${TOKEN}" -H "accept: application/json;charset=utf-8" -o tmp_search_response.txt)
+		else
+			>&2 echo "ERROR : unknown authentication type '$AUTH'. Abort..."
+			usage
+			exit 1
+        fi
+    fi
+fi
 if [ $http_response_code == "200" ]; then
     nbhits=$(jq '.nbhits' tmp_search_response.txt)
 else
@@ -117,7 +128,21 @@ then
     T=$(jq .links.next.href tmp_search_response.txt)
     while [ "${T}" != "null" ]
         do
-            curl -k -X  GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8"  -H "authorization: bearer ${TOKEN}" -o tmp_search_response.txt
+            if [ -v AUTH ]; then
+                if [ "${AUTH}" == "basic" ]; then
+                        curl -k -X  GET ${T//\"} -u ${login}:${password} -H "accept: application/json;charset=utf-8"  -o tmp_search_response.txt
+                 else if [ "${AUTH}" == "token" ]; then
+			            if [ ! -v TOKEN ]; then >&2 echo "ERROR : --token argument is missing "; usage; fi
+                        curl -k -X  GET ${T//\"}  -H "accept: application/json;charset=utf-8"  -H "authorization: Basic ${TOKEN}" -o tmp_search_response.txt
+		                else
+			                >&2 echo "ERROR : unknown authentication type '$AUTH'. Abort..."
+			                usage
+			                exit 1
+                        fi
+                fi
+            else 
+                curl -k -X  GET ${T//\"}  -H "accept: application/json;charset=utf-8"  -o tmp_search_response.txt
+            fi
             nbhits=$(jq '.nbhits' tmp_search_response.txt)
             if [ "$nbhits" -eq 0 ]
             then
