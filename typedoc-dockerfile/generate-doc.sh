@@ -9,7 +9,7 @@ mkdir typedoc_docs
 
 ## INSTALL DEPENDENCIES OF THE MOUNTED FOLDER + INSTALL TYPEDOC AND MARKDOWN PLUGIN
 npm install
-npm add typedoc@0.23.22 typedoc-plugin-markdown@3.14.0
+npm add typedoc@0.23.28 typedoc-plugin-markdown@3.14.0
 
 ## GENERATE THE DOCUMENTATTION
 node_modules/.bin/typedoc  --theme markdown  --excludePrivate --out ./typedoc_docs/ $(echo "$@"| tr " " "\n")
