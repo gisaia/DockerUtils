@@ -2,7 +2,7 @@
 ### STAGE 1: Build ###
 
 # We label our stage as 'builder'
-FROM node:8-alpine as builder
+FROM node:18.20.5-alpine as builder
 
 COPY ./package.json     ./
 
@@ -17,7 +17,7 @@ WORKDIR /ng-app
 
 COPY . .
 
-LABEL com.gisaia.tools.jsonschema2md=0.1.0
+LABEL com.gisaia.tools.jsonschema2md=8.0.2
 LABEL vendor="Gisaïa"
 LABEL description="This container build and serve the jsonschema2md app"
 
