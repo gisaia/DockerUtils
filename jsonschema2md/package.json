@@ -1,13 +1,13 @@
 {
   "name": "jsonschema2md",
   "description": "Validate and document complex JSON Schemas the easy way.",
-  "version": "1.0.6",
+  "version": "8.0.2",
   "scripts": {},
   "dependencies": {
-    "@adobe/jsonschema2md": "^1.0.6"
+    "@adobe/jsonschema2md": "8.0.2"
   },
   "engines": {
-    "node": ">= 6.0.0"
+    "node": "^18.0.0 || >= 20.0.0"
   },
   "license": "Apache-2.0",
   "author": ""
