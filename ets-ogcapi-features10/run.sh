@@ -11,13 +11,13 @@ echo "Total test number : "$TOTAL
 echo "Skipped test number : "$SKIPPED 
 echo "Failed test number : "$FAILED 
 echo "Passed test number : "$PASSED
-EXPECTED="2"
+EXPECTED="1"
 
 if [ "$FAILED" = "$EXPECTED" ]
 then 
-    echo "ALL STAC test succeeded except 2 as expected"
+    echo "ALL STAC test succeeded except 1 as expected"
 else
-    echo "More than 2 STAC tests failed"
+    echo "More than 1 STAC tests failed"
     find testng/* -name 'testng-results.xml' | xargs xmlstarlet fo -t
     exit 1
 fi

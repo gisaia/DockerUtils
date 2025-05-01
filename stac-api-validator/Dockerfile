@@ -34,3 +34,5 @@ COPY git.patch ./
 CMD /stac-validator/run.sh
 
 
+COPY . /opt/app/
+ENTRYPOINT [ "/opt/app/run.sh" ] 
