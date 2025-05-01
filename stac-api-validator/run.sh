@@ -1,11 +1,17 @@
 #!/bin/sh
-set -e
-ERRORS=`python /usr/src/stac_api_validator/validate.py --root ${STAC_URL}  | sed -n '/^errors:$/,$p' | grep -v "1937-01-01" | sed 1,1d > result.txt`
-FAILED=`wc -l < result.txt`
-echo "Failed test number: "$FAILED
-EXPECTED=0 #
+git apply git.patch
+RESULT=`poetry run stac-api-validator --root-url ${STAC_URL} --collection ${STAC_COLLECTION} \
+--conformance core \
+--conformance features \
+--conformance collections \
+--conformance item-search \
+--conformance item-search#sort \
+--conformance features#sort \
+--geometry '{"type": "Polygon", "coordinates": [[[-179, 89],[-179,-89 ],[179,-89],[179,89],[-179,89]]]}' > result.txt`
+NO_ERROR=`cat result.txt | grep "Errors:"`
+EXPECTED="Errors: none"
 
-if [ "$FAILED" = "$EXPECTED" ]
+if [ "$NO_ERROR" = "$EXPECTED" ]
 then
     echo "ALL STAC test succeeded"
 else

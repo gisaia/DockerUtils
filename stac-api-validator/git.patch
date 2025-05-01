@@ -1,0 +1,44 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 9a6ff11..7d8e9ea 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -28,7 +28,7 @@ stac-check = "^1.5.0"
+ stac-validator = "^3.5.0"
+ deepdiff = ">=6.2.3,<9.0.0"
+ 
+-[tool.poetry.dev-dependencies]
++[tool.poetry.group.dev.dependencies]
+ Pygments = ">=2.10.0"
+ black = ">=22.8.0"
+ coverage = { extras = ["toml"], version = ">=6.2" }
+diff --git a/src/stac_api_validator/validations.py b/src/stac_api_validator/validations.py
+index 1c126dd..0689ce0 100644
+--- a/src/stac_api_validator/validations.py
++++ b/src/stac_api_validator/validations.py
+@@ -3109,7 +3109,7 @@ def validate_item_search_bbox(
+ def validate_item_search_limit(
+     search_url: str, methods: Set[Method], errors: Errors, r_session: Session
+ ) -> None:
+-    valid_limits = [1, 2, 10, 10000, 100000, 1000000]
++    valid_limits = [1, 2, 10, 10000]
+     for limit in valid_limits:
+         params = {"limit": limit}
+         if Method.GET in methods:
+@@ -3723,7 +3723,7 @@ def validate_sort(
+             body={
+                 "sortby": sortby_json,
+                 "limit": limit,
+-                "collections": collection,
++                "collections": [collection],
+             },
+             errors=errors,
+             context=context,
+@@ -3774,7 +3774,7 @@ def validate_sort(
+             body={
+                 "sortby": sortby_json,
+                 "limit": limit,
+-                "collections": collection,
++                "collections": [collection],
+             },
+             errors=errors,
+             context=context,

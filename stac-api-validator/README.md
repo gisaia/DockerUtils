@@ -1,6 +1,6 @@
 ## Usage : 
 ```
-docker run --env STAC_URL="{$STAC_URL}" -ti gisaia/stac-api-validator:latest
+docker run --env STAC_URL="{$STAC_URL}" --env STAC_COLLECTION="{$STAC_COLLECTION}" -ti gisaia/stac-api-validator:latest
 ```
 
 ## Publish the docker image in DockerHub :
