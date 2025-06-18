@@ -10,4 +10,4 @@ RUN pip install mkdocs==1.6.1 \
   && pip install griffe-pydantic==1.1.4 \
   && pip install mkdocs-material==9.6.14 
 EXPOSE 8000
-CMD ["mkdocs"]
+ENTRYPOINT ["mkdocs"]
