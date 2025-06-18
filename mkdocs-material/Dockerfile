@@ -8,6 +8,7 @@ RUN pip install mkdocs==1.6.1 \
   && pip install mkdocstrings==0.29.1 \
   && pip install mkdocstrings-python==1.16.12 \
   && pip install griffe-pydantic==1.1.4 \
-  && pip install mkdocs-material==9.6.14 
+  && pip install mkdocs-material==9.6.14 \
+  && pip install pydantic==2.11.7
 EXPOSE 8000
 ENTRYPOINT ["mkdocs"]
