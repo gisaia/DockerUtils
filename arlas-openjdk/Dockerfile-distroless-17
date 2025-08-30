@@ -9,5 +9,5 @@ FROM gcr.io/distroless/java17-debian12
 WORKDIR /opt/app
 
 COPY --from=deb_extractor /dpkg /
-ADD HttpHealthcheck.java /opt/app/HttpHealthcheck.java
-ADD elastic-apm-agent-*.jar /opt/app/elastic-apm-agent.jar
+COPY HttpHealthcheck.java /opt/app/HttpHealthcheck.java
+COPY elastic-apm-agent-*.jar /opt/app/elastic-apm-agent.jar
