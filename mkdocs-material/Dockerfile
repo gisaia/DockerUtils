@@ -1,6 +1,7 @@
 FROM python:3.12.11
 WORKDIR /docs
 RUN pip install mkdocs==1.6.1 \
+  && pip install mkdocs-to-pdf==0.10.1 \
   && pip install mkdocs-with-pdf==0.9.3 \
   && pip install pymdown-extensions==10.15 \
   && pip install mkdocs_puml==2.3.0 \
