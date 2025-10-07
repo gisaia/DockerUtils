@@ -6,6 +6,7 @@ RUN pip install mkdocs==1.6.1 \
   && pip install pymdown-extensions==10.15 \
   && pip install mkdocs_puml==2.3.0 \
   && pip install mkdocs-mermaid2-plugin==1.2.1 \
+  && pip install mkdocs-panzoom-plugin==0.4.2 \
   && pip install mkdocs-redoc-tag==0.2.0 \
   && pip install mkdocstrings==0.29.1 \
   && pip install mkdocstrings-python==1.16.12 \
