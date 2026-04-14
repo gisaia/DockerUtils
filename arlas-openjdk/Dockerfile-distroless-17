@@ -5,9 +5,16 @@ RUN cd /tmp && \
     mkdir /dpkg && \
     for deb in *.deb; do dpkg --extract $deb /dpkg || exit 10; done
 
+FROM eclipse-temurin:17-jdk AS builder
+
+WORKDIR /opt/app
+COPY HttpHealthcheck.java .
+
+RUN javac HttpHealthcheck.java
+
 FROM gcr.io/distroless/java17-debian13
 WORKDIR /opt/app
 
 COPY --from=deb_extractor /dpkg /
-COPY HttpHealthcheck.java /opt/app/HttpHealthcheck.java
+COPY --from=builder /opt/app/HttpHealthcheck.class .
 COPY elastic-apm-agent-*.jar /opt/app/elastic-apm-agent.jar
