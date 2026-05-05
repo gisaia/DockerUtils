@@ -18,4 +18,4 @@ WORKDIR /opt/app
 
 COPY --from=deb_extractor /dpkg /
 COPY --from=builder /opt/app/HttpHealthcheck.class .
-COPY elastic-apm-agent-*.jar /opt/app/elastic-apm-agent.jar
+COPY opentelemetry-javaagent-*.jar /opt/app/opentelemetry-javaagent.jar
