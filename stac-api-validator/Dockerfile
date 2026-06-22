@@ -1,9 +1,9 @@
 # Use an official Python runtime as a base image
-FROM python:3.10-slim-buster
+FROM python:3.10-slim
 
 # Install system dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc curl gnupg2 netcat bash git && \
+    apt-get install -y --no-install-recommends gcc curl gnupg2 netcat-openbsd bash git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

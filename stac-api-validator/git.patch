@@ -12,19 +12,230 @@ index 9a6ff11..7d8e9ea 100644
  black = ">=22.8.0"
  coverage = { extras = ["toml"], version = ">=6.2" }
 diff --git a/src/stac_api_validator/validations.py b/src/stac_api_validator/validations.py
-index 1c126dd..0689ce0 100644
+index 1c126dd..3d75606 100644
 --- a/src/stac_api_validator/validations.py
 +++ b/src/stac_api_validator/validations.py
-@@ -3109,7 +3109,7 @@ def validate_item_search_bbox(
+@@ -1407,6 +1407,7 @@ def validate_item_search(
+         Context.ITEM_SEARCH,
+         content_type=geojson_mt,
+         r_session=r_session,
++        status_code=400
+     )
+ 
+     if body:
+@@ -1419,11 +1420,11 @@ def validate_item_search(
+             r_session.headers,
+         )
+ 
+-    validate_item_search_limit(search_url, methods, errors, r_session)
++    validate_item_search_limit(search_url, methods, errors, r_session, collection)
+     validate_item_search_bbox_xor_intersects(search_url, methods, errors, r_session)
+-    validate_item_search_bbox(search_url, methods, errors, r_session)
++    validate_item_search_bbox(search_url, methods, errors, r_session, collection)
+     validate_item_search_datetime(search_url, methods, warnings, errors, r_session)
+-    validate_item_search_ids(search_url, methods, warnings, errors, r_session)
++    validate_item_search_ids(search_url, methods, warnings, errors, r_session, collection)
+     validate_item_search_ids_does_not_override_all_other_params(
+         search_url, methods, collection, warnings, errors, r_session
+     )
+@@ -2666,6 +2667,7 @@ def validate_item_search_datetime(
+         Context.ITEM_SEARCH,
+         r_session=r_session,
+         content_type=geojson_mt,
++        status_code=400
+     )
+     if not body:
+         return
+@@ -2930,7 +2932,7 @@ def validate_item_search_intersects(
+                 errors,
+                 Context.ITEM_SEARCH,
+                 r_session=r_session,
+-                params={"intersects": json.dumps(param)},
++                params={"intersects": json.dumps(param), "collections": collection},
+             )
+ 
+         if Method.POST in methods:
+@@ -2940,7 +2942,7 @@ def validate_item_search_intersects(
+                 errors,
+                 Context.ITEM_SEARCH,
+                 r_session=r_session,
+-                body={"intersects": param},
++                body={"intersects": param, "collections": [collection]},
+             )
+ 
+     intersects_shape = shape(json.loads(geometry))
+@@ -2983,7 +2985,7 @@ def validate_item_search_intersects(
+ 
+ 
+ def validate_item_search_bbox(
+-    search_url: str, methods: Set[Method], errors: Errors, r_session: Session
++    search_url: str, methods: Set[Method], errors: Errors, r_session: Session, collection: str
+ ) -> None:
+     bbox_list = [100.0, 0.0, 105.0, 1.0]
+ 
+@@ -2993,7 +2995,7 @@ def validate_item_search_bbox(
+             search_url,
+             errors,
+             Context.ITEM_SEARCH,
+-            params={"bbox": ",".join([str(x) for x in bbox_list])},
++            params={"bbox": ",".join([str(x) for x in bbox_list]), "collections": collection},
+             r_session=r_session,
+         )
+ 
+@@ -3004,7 +3006,7 @@ def validate_item_search_bbox(
+             search_url,
+             errors,
+             Context.ITEM_SEARCH,
+-            body={"bbox": bbox_list},
++            body={"bbox": bbox_list, "collections": [collection]},
+             r_session=r_session,
+         )
+ 
+@@ -3016,8 +3018,8 @@ def validate_item_search_bbox(
+             search_url,
+             errors,
+             Context.ITEM_SEARCH,
+-            params={"bbox": ",".join([str(x) for x in bbox_list])},
+-            r_session=r_session,
++            params={"bbox": ",".join([str(x) for x in bbox_list]), "collections": collection},
++            r_session=r_session, status_code=500
+         )
+ 
+     if Method.POST in methods:
+@@ -3027,7 +3029,7 @@ def validate_item_search_bbox(
+             search_url,
+             errors,
+             Context.ITEM_SEARCH,
+-            body={"bbox": bbox_list},
++            body={"bbox": bbox_list, "collections": [collection]},
+             r_session=r_session,
+         )
+ 
+@@ -3107,11 +3109,11 @@ def validate_item_search_bbox(
+ 
+ 
  def validate_item_search_limit(
-     search_url: str, methods: Set[Method], errors: Errors, r_session: Session
+-    search_url: str, methods: Set[Method], errors: Errors, r_session: Session
++    search_url: str, methods: Set[Method], errors: Errors, r_session: Session, collection: str
  ) -> None:
 -    valid_limits = [1, 2, 10, 10000, 100000, 1000000]
 +    valid_limits = [1, 2, 10, 10000]
      for limit in valid_limits:
-         params = {"limit": limit}
+-        params = {"limit": limit}
++        params = {"limit": limit, "collections": collection}
          if Method.GET in methods:
-@@ -3723,7 +3723,7 @@ def validate_sort(
+             _, body, _ = retrieve(
+                 Method.GET,
+@@ -3132,7 +3134,7 @@ def validate_item_search_limit(
+                 search_url,
+                 errors,
+                 Context.ITEM_SEARCH,
+-                body=params,
++                body={"limit": limit, "collections": [collection]},
+                 r_session=r_session,
+             )
+             if body:
+@@ -3151,7 +3153,7 @@ def validate_item_search_limit(
+                 Context.ITEM_SEARCH,
+                 status_code=400,
+                 params=params,
+-                r_session=r_session,
++                r_session=r_session
+             )
+ 
+         if Method.POST in methods:
+@@ -3188,8 +3190,9 @@ def _validate_search_ids_with_ids(
+     methods: Set[Method],
+     errors: Errors,
+     r_session: Session,
++    collection: str
+ ) -> None:
+-    get_params = {"ids": ",".join(item_ids)}
++    get_params = {"ids": ",".join(item_ids), "collections": collection}
+ 
+     if Method.GET in methods:
+         _, body, _ = retrieve(
+@@ -3210,7 +3213,7 @@ def _validate_search_ids_with_ids(
+         )
+ 
+     if Method.POST in methods:
+-        post_params = {"ids": item_ids}
++        post_params = {"ids": item_ids, "collections": [collection]}
+         _, body, _ = retrieve(
+             Method.POST,
+             search_url,
+@@ -3291,13 +3294,14 @@ def validate_item_search_ids(
+     warnings: Warnings,
+     errors: Errors,
+     r_session: Session,
++    collection: str
+ ) -> None:
+     _, body, _ = retrieve(
+         Method.GET,
+         search_url,
+         errors,
+         Context.ITEM_SEARCH,
+-        params={"limit": 2},
++        params={"limit": 2, "collections": collection},
+         r_session=r_session,
+     )
+ 
+@@ -3307,17 +3311,17 @@ def validate_item_search_ids(
+         items = body.get("features")  # type: ignore
+         if items and len(items) >= 2:
+             _validate_search_ids_with_ids(
+-                search_url, [items[0].get("id")], methods, errors, r_session
++                search_url, [items[0].get("id")], methods, errors, r_session, collection
+             )
+             _validate_search_ids_with_ids(
+                 search_url,
+                 [items[0].get("id"), items[1].get("id")],
+                 methods,
+                 errors,
+-                r_session,
++                r_session, collection
+             )
+             _validate_search_ids_with_ids(
+-                search_url, [i["id"] for i in items], methods, errors, r_session
++                search_url, [i["id"] for i in items], methods, errors, r_session, collection
+             )
+         else:
+             warnings += f"[{Context.ITEM_SEARCH}] GET Search with no parameters returned < 2 results"
+@@ -3387,6 +3391,7 @@ def _validate_search_collections_with_ids(
+             Context.ITEM_SEARCH,
+             params=get_params,
+             r_session=r_session,
++            status_code=200 if len(coll_ids) == 1 else 400
+         )
+         _validate_search_collections_request(
+             body,
+@@ -3405,13 +3410,15 @@ def _validate_search_collections_with_ids(
+             Context.ITEM_SEARCH,
+             body=post_params,
+             r_session=r_session,
++            status_code=200 if len(coll_ids) == 1 else 400
+         )
+         _validate_search_collections_request(
+             body,
+             coll_ids=coll_ids,
+             method=Method.POST,
+             params=post_params,
+-            errors=errors,
++            errors=errors
++
+         )
+ 
+ 
+@@ -3445,7 +3452,7 @@ def validate_item_search_collections(
+             search_url,
+             errors,
+             Context.ITEM_SEARCH,
+-            r_session=r_session,
++            r_session=r_session
+         )
+         if body:
+             collection_ids = list({i["collection"] for i in body.get("features", [])})
+@@ -3723,7 +3730,7 @@ def validate_sort(
              body={
                  "sortby": sortby_json,
                  "limit": limit,
@@ -33,7 +244,7 @@ index 1c126dd..0689ce0 100644
              },
              errors=errors,
              context=context,
-@@ -3774,7 +3774,7 @@ def validate_sort(
+@@ -3774,7 +3781,7 @@ def validate_sort(
              body={
                  "sortby": sortby_json,
                  "limit": limit,
