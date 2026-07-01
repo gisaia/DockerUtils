@@ -11,7 +11,7 @@ echo "Total test number : "$TOTAL
 echo "Skipped test number : "$SKIPPED 
 echo "Failed test number : "$FAILED 
 echo "Passed test number : "$PASSED
-EXPECTED="1"
+EXPECTED="0"
 
 if [ "$FAILED" = "$EXPECTED" ]
 then 

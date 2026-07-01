@@ -1,0 +1,37 @@
+diff --git a/pom.xml b/pom.xml
+index a4be53a..a797ccb 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -158,10 +158,32 @@
+       <plugin>
+         <artifactId>maven-scm-publish-plugin</artifactId>
+       </plugin>
++        <plugin>
++            <groupId>org.apache.maven.plugins</groupId>
++            <artifactId>maven-site-plugin</artifactId>
++            <version>3.21.0</version>
++            <executions>
++                <execution>
++                    <id>site-package</id>
++                    <phase>none</phase>
++                </execution>
++            </executions>
++        </plugin>
+     </plugins>
+ 
+     <pluginManagement>
+       <plugins>
++          <plugin>
++              <groupId>org.apache.maven.plugins</groupId>
++              <artifactId>maven-site-plugin</artifactId>
++              <version>3.21.0</version>
++              <executions>
++                  <execution>
++                      <id>site-package</id>
++                      <phase>none</phase>
++                  </execution>
++              </executions>
++          </plugin>
+         <plugin>
+           <groupId>io.fabric8</groupId>
+           <artifactId>docker-maven-plugin</artifactId>
