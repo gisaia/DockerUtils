@@ -16,7 +16,7 @@ source /opt/configure_user_and_group.bash
 ################################################################################
 # Define command to be called
 ################################################################################
-COMMAND="/usr/local/openjdk-11/bin/java \
+COMMAND="/opt/java/openjdk/bin/java \
   -jar /opt/swagger/swagger-codegen-cli.jar \
     generate \
     -i /input/api.json \
