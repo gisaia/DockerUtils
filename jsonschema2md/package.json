@@ -4,7 +4,7 @@
   "version": "8.0.2",
   "scripts": {},
   "dependencies": {
-    "@adobe/jsonschema2md": "8.0.2"
+    "@adobe/jsonschema2md": "8.0.8"
   },
   "engines": {
     "node": "^18.0.0 || >= 20.0.0"
